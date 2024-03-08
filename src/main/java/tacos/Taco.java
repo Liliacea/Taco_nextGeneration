@@ -1,6 +1,7 @@
 package tacos;
 
 import lombok.Data;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Data
 @Entity
+@RestResource(rel = "tacos", path = "/tacos")
 public class Taco {
 
     @Id
@@ -23,8 +25,8 @@ public class Taco {
 
     private Date createdAt = new Date();
 
+    @ManyToMany(targetEntity=Ingredient.class)
     @Size(min=1, message="You must choose at least 1 ingredient")
-    @ManyToMany()
     private List<Ingredient> ingredients = new ArrayList<>();
 
     public void addIngredient(Ingredient ingredient) {

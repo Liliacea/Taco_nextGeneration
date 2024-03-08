@@ -3,6 +3,7 @@ package tacos.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -57,6 +58,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             //.cors().disable()
             //.csrf().disable()
             .authorizeRequests()
+            //.antMatchers(HttpMethod.POST, "/ingredients").hasRole("ADMIN")
+           // .antMatchers(HttpMethod.DELETE, "/ingredients/**").hasRole("ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/ingredients").hasAuthority("SCOPE_writeIngredients")
+            .antMatchers(HttpMethod.DELETE, "/api/ingredients").hasAuthority("SCOPE_deleteIngredients")
+            .antMatchers(HttpMethod.OPTIONS).permitAll() // needed for Angular/CORS
+            //.antMatchers(HttpMethod.GET).permitAll()
+            .antMatchers("/**").permitAll()
             .mvcMatchers("/design", "/orders/current").hasRole("USER")
             .anyRequest().permitAll()
             .and()
@@ -68,7 +76,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .headers()
             .frameOptions()
-            .sameOrigin();
+            .sameOrigin()
+            .and()
+            .csrf()
+            .ignoringAntMatchers( "/**")
+            .and()
+            .oauth2ResourceServer(oauth2->oauth2.jwt())
+    ;
 
   }
 
